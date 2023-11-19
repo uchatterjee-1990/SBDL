@@ -17,4 +17,4 @@ if __name__ == "__main__":
         ("Abdul", 60)]
 
     df = spark.createDataFrame(data_list).toDF("Name", "Age")
-    df.show()
+    df.collect()
