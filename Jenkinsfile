@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-               sh 'pipenv --python python3 sync'
+               sh '/Library/Frameworks/Python.framework/Versions/3.10/bin/pipenv --python python3 sync'
             }
         }
         stage('Test') {
