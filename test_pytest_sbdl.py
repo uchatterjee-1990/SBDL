@@ -195,6 +195,7 @@ def test_blank_test(spark):
     print(spark.version)
     assert spark.version == "3.5.0"
 
+    
 def test_get_config():
     conf_local = get_config("LOCAL")
     conf_qa = get_config("QA")
