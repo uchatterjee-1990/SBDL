@@ -193,7 +193,49 @@ def expected_relation_address_df(spark):
 
 def test_blank_test(spark):
     print(spark.version)
-    assert spark.version == "3.4.1"
+    assert spark.version == "3.5.0"
+
+    
+def test_get_config():
+    conf_local = get_config("LOCAL")
+    conf_qa = get_config("QA")
+    assert conf_local["kafka.topic"] == "sbdl_kafka_cloud"
+    assert conf_qa["hive.database"] == "sbdl_db_qa"
+
+
+def test_read_accounts(spark):
+    accounts_df = DataLoader.read_accounts(spark, "LOCAL", False, None)
+    assert accounts_df.count() == 8
+
+
+def test_read_parties_row(spark, expected_party_rows):
+    actual_party_rows = DataLoader.read_parties(spark, "LOCAL", False, None).collect()
+    assert expected_party_rows == actual_party_rows
+
+
+def test_read_parties(spark, parties_list):
+    expected_df = spark.createDataFrame(parties_list)
+    actual_df = DataLoader.read_parties(spark, "LOCAL", False, None)
+    assert_df_equality(expected_df, actual_df, ignore_schema=True)
+
+
+def test_read_party_schema(spark, parties_list):
+    expected_df = spark.createDataFrame(parties_list, get_party_schema())
+    actual_df = DataLoader.read_parties(spark, "LOCAL", False, None)
+    assert_df_equality(expected_df, actual_df)
+
+
+def test_get_contract(spark, expected_contract_df):
+    accounts_df = DataLoader.read_accounts(spark, "LOCAL", False, None)
+    actual_contract_df = Transformations.get_contract(accounts_df)
+    assert expected_contract_df.collect() == actual_contract_df.collect()
+    assert_df_equality(expected_contract_df, actual_contract_df, ignore_schema=True)
+
+
+def test_read_party_address(spark, expected_relation_address_df):
+    actual_address_df = DataLoader.read_address(spark, "LOCAL", False, None)
+    actual_relation_address_df = Transformations.get_address(actual_address_df)
+    assert actual_relation_address_df.collect() == expected_relation_address_df.collect()
 
 def test_get_config():
     conf_local = get_config("LOCAL")
